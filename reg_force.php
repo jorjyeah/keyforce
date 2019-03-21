@@ -93,6 +93,7 @@
         exit;
     }
 
+    // used 
     function receiveDataFromApps(){
         //receive data from apps
         // generateSalt();
