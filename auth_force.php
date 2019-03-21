@@ -19,16 +19,36 @@
     }
 
     function getKey(){
-        $username = $_POST['username'];
-        include 'connections.php';
+        // $username = $_POST['username'];
+        $username = "pak";
+        $keyhandle = getSecret($username,"keyhandle");
+        $publickey = getSecret($username,"publickey");
+        $salt = getSecret($username,"salt");
+        echo "<br>";
+        echo " | keyhandle = ";
+        var_dump($keyhandle);
+        echo "<br>";
+        echo " | publickey = ";
+        var_dump($publickey);
+        echo "<br>";
+        echo " | salt = ";
+        var_dump($salt);
+        echo "<br>";
+        echo crypt($salt,$publickey);
+        // encrypt salt ddengan kpub;
 
-        $sql = 'SELECT keyhandle FROM credential WHERE username="'.$username.'"';
+        // echo json_encode($key);
+        // exit;
+    }
+
+    function getSecret($usname,$identifier){
+        include 'connections.php';
+        $sql = 'SELECT '.$identifier.' FROM credential WHERE username="'.$usname.'"';
         $result = mysqli_query($conn, $sql);
-        
         if (mysqli_num_rows($result) > 0) {
             while($row = $result->fetch_assoc()) {
-                if($row["keyhandle"] != NULL){ 
-                    $key = $row["keyhandle"];
+                if($row[$identifier] != NULL){ 
+                    $key = $row[$identifier];
                 }else{
                     $key = NULL;
                 }
@@ -37,9 +57,7 @@
             $key = NULL;
         }
         mysqli_close($conn);
-
-        echo json_encode($key);
-        exit;
+        return $key;
     }
 
     function inputUnique(){
@@ -55,16 +73,13 @@
         } else {
             $status = 0;
         }
-
         mysqli_close($conn);
-    
-
         echo json_encode($status);
         exit;
     }
 
-    $func = $_POST['func']; //remember to escape it
-    // $func = 'inputUnique';
+    //$func = $_POST['func'];
+    $func = 'getKey';
     switch ($func) {
         case 'checkUsername':
             checkUsername();
@@ -72,9 +87,6 @@
         case 'getKey':
             getKey();
             break;
-        // case 'getChallengeKey':
-        //     getChallengeKey();
-        //     break;
         case 'inputUnique':
             inputUnique();
             break;
