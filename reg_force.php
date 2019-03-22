@@ -45,30 +45,29 @@
     }
 
     function generateNewChallenge(){
-        $challenge = bin2hex(random_bytes(5));
+        $challenge = bin2hex(random_bytes(8));
 
-        $username = $_POST['username'];
-        $status;
-        include 'connections.php';
+        // $username = $_POST['username'];
+        // $status;
+        // include 'connections.php';
 
-        $sql = 'SELECT * FROM credential WHERE username="'.$username.'"';
-        $result = mysqli_query($conn, $sql);
+        // $sql = 'SELECT * FROM credential WHERE username="'.$username.'"';
+        // $result = mysqli_query($conn, $sql);
         
-        if (mysqli_num_rows($result) > 0) {
-            $sql = "UPDATE credential SET challenge='".$challenge."' WHERE username='".$username."'";
-        } else {
-            $sql = "INSERT INTO credential(username, challenge)VALUES ('".$username."','".$challenge."')";
-        }
+        // if (mysqli_num_rows($result) > 0) {
+        //     $sql = "UPDATE credential SET challenge='".$challenge."' WHERE username='".$username."'";
+        // } else {
+        //     $sql = "INSERT INTO credential(username, challenge)VALUES ('".$username."','".$challenge."')";
+        // }
         
-        if (mysqli_query($conn, $sql)) {
-            $status = 1;
-        } else {
-            $status = 0;
-        }
+        // if (mysqli_query($conn, $sql)) {
+        //     $status = 1;
+        // } else {
+        //     $status = 0;
+        // }
 
-        mysqli_close($conn);
-
-        echo json_encode(bin2hex($challenge));
+        // mysqli_close($conn);
+        echo json_encode($challenge);
 
         exit;
     }
