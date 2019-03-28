@@ -13,32 +13,23 @@
             $status = 0;
         }
         mysqli_close($conn);
-
         echo json_encode($status);
         exit;
     }
 
     function getKey(){
-        // $username = $_POST['username'];
-        $username = "pak";
-        $keyhandle = getSecret($username,"keyhandle");
-        $publickey = getSecret($username,"publickey");
-        $salt = getSecret($username,"salt");
-        echo "<br>";
-        echo " | keyhandle = ";
-        var_dump($keyhandle);
-        echo "<br>";
-        echo " | publickey = ";
-        var_dump($publickey);
-        echo "<br>";
-        echo " | salt = ";
-        var_dump($salt);
-        echo "<br>";
-        echo crypt($salt,$publickey);
+        $key = array(
+            'keyhandle' => getSecret($_POST['username'],"keyhandle"),
+            'publickey' => getSecret($_POST['username'],"publickey"),
+            'challenge' => getSecret($_POST['username'],"challenge"),
+            'salt' => getSecret($_POST['username'],"salt"),
+            'encryptedsalt' => crypt(getSecret($_POST['username'],"salt"),getSecret($_POST['username'],"publickey")),
+            "appId" => "http://192.168.137.1/invicikey",
+            "auth_portal"=> "http://192.168.137.1/keyforce/auth_portal.php"
+        );        
         // encrypt salt ddengan kpub;
-
-        // echo json_encode($key);
-        // exit;
+        echo json_encode($key);
+        exit;
     }
 
     function getSecret($usname,$identifier){
@@ -78,8 +69,8 @@
         exit;
     }
 
-    //$func = $_POST['func'];
-    $func = 'getKey';
+    $func = $_POST['func'];
+    // $func = 'getKey';
     switch ($func) {
         case 'checkUsername':
             checkUsername();
