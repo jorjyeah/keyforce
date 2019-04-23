@@ -92,8 +92,7 @@
         exit;
     }
 
-    // $func = $_POST['func']; 
-    $func = "checkUsername()"
+    $func = $_POST['func']; 
     switch ($func) {
         case 'checkUsername':
             checkUsername();
