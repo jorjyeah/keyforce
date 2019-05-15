@@ -19,17 +19,31 @@
 
     function getKey(){
         $key = array(
+            'action' => "authentication",
+            'username' => $_POST['username'],
             'keyhandle' => getSecret($_POST['username'],"keyhandle"),
-            'publickey' => getSecret($_POST['username'],"publickey"),
             'challenge' => getSecret($_POST['username'],"challenge"),
-            'salt' => getSecret($_POST['username'],"salt"),
-            'encryptedsalt' => crypt(getSecret($_POST['username'],"salt"),getSecret($_POST['username'],"publickey")),
-            "appId" => "http://192.168.137.1/invicikey",
-            "auth_portal"=> "http://192.168.137.1/keyforce/auth_portal.php"
+            'appId' => "http://192.168.0.177/invicikey",
+            'auth_portal' => "http://192.168.0.177/keyforce/",
+            'encryptedsalt' => encryptSalt(getSecret($_POST['username'],"salt"), getSecret($_POST['username'],"publickey"))
         );        
         // encrypt salt ddengan kpub;
         echo json_encode($key);
         exit;
+    }
+
+    function encryptSalt($salt, $keypub){
+        set_include_path(get_include_path() . PATH_SEPARATOR . 'phpseclib');
+        include 'phpseclib/Crypt/RSA.php';
+        include 'phpseclib/Crypt/Random.php';
+        $publickey = getSecret($_POST['username'],"publickey");
+        $salt = getSecret($_POST['username'],"salt");
+
+        $rsa = new Crypt_RSA();
+        $rsa->loadKey($publickey);
+        $rsa->setEncryptionMode(CRYPT_RSA_ENCRYPTION_PKCS1);
+        $encryptedsalt = $rsa->encrypt($salt);
+        return base64_encode($encryptedsalt);
     }
 
     function getSecret($usname,$identifier){
@@ -68,9 +82,8 @@
         echo json_encode($status);
         exit;
     }
-
+    
     $func = $_POST['func'];
-    // $func = 'getKey';
     switch ($func) {
         case 'checkUsername':
             checkUsername();
