@@ -61,7 +61,7 @@
     function updateSession($sessionid){
         $username = $_POST['username'];
         include 'connections.php';
-        $sql = "UPDATE credential SET sessionid='".$sessionid."' WHERE username='".$username."'";
+        $sql = "UPDATE credential SET sessionid='".$sessionid."', validUntil= NOW() + INTERVAL 30 SECOND WHERE username='".$username."'";
         
         if (mysqli_query($conn, $sql)) {
             mysqli_close($conn);
@@ -73,6 +73,7 @@
 
     function checkAuthenticated(){
         session_start();
+        $_SESSION['authenticated']=false;
         if(isset($_SESSION['username']))
         {
             $username=$_SESSION['username'];
@@ -104,17 +105,20 @@
             
             mysqli_close($conn);
 
+            $_SESSION['authenticated_id_system']=$authenticated;
+            $_SESSION['authenticated_id_database']=$authenticatedDatabase;
+
             if($auth1 && $auth2){
                 //TODO: authenticated set as hash value
                 $_SESSION['authenticated']=true;
                 //header('Location:/2fysh/hello.php');
-                echo json_encode("http://localhost/invicikey/yourpage.php");
-                exit;
-            }else{ 
-                echo json_encode('authentication failed');
-                exit;
+            }else{
+                $_SESSION['authenticated']=false;
             }
-
+            // $auth_array = array($_SESSION['authenticated'], $_SESSION['authenticated_id_system'], $_SESSION['authenticated_id_database']);
+            echo json_encode($_SESSION['authenticated']);
+            // echo json_encode($auth_array);
+            exit;
         }
     }
 
@@ -151,6 +155,37 @@
         return $key;
     }
 
+    function checkIdBle(){
+        $username = $_POST['username'];
+        $idBleReceived = $_POST['idBle'];
+        include 'connections.php';
+
+        $sql = 'SELECT macble FROM credential WHERE username="'.$username.'"';
+        $result = mysqli_query($conn, $sql);
+        
+        if (mysqli_num_rows($result) > 0) {
+            while($row = $result->fetch_assoc()) {
+                if($row['macble'] != NULL){ 
+                    $idBleGenerated = $row['macble'];
+                }else{
+                    $idBleGenerated = NULL;
+                }
+            }
+        } else {
+            $idBleGenerated = 0;
+        }
+        mysqli_close($conn);
+
+        if ($idBleGenerated == $idBleReceived){
+            $status = true;
+        }else{
+            $status = false;
+        }
+        
+        echo json_encode($status);
+        exit;
+    }
+
     $func = $_POST['func'];
     switch ($func) {
         case 'checkUsername':
@@ -161,6 +196,9 @@
             break;
         case 'checkAuthenticated':
             checkAuthenticated();
+            break;
+        case 'checkIdBle':
+            checkIdBle();
             break;
         default:
             echo "false routing";

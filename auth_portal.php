@@ -12,7 +12,7 @@
             include 'phpseclib/Crypt/RSA.php';
             include 'phpseclib/Crypt/Random.php';
 
-            include 'constant.php';
+            include 'constants.php';
             require_once('connections.php');
 
             //sql get challenge_salt & public key
@@ -69,7 +69,6 @@
                 //update authenticated
                 $hash = new Crypt_Hash('sha1');
                 $authenticated = bin2hex($hash->hash($STRINGTRUE.$salt_generated.$sessionid_generated.$PEPPER));
-
                 $sql = "UPDATE credential SET authenticated='".$authenticated."' WHERE username='".$username."'";
                 if (mysqli_query($conn, $sql)) {
                     $status = 1;
@@ -81,7 +80,7 @@
                 mysqli_close($conn);
             } else {
                 $status = 0;
-                $message = "authentication faiked";
+                $message = "authentication failed";
             }
             $response["status"] = $status;
             $response["message"] = $message;
