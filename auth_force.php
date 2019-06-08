@@ -157,6 +157,7 @@
 
     function checkIdBle(){
         $username = $_POST['username'];
+        // !!!! please change to session id
         $idBleReceived = $_POST['idBle'];
         include 'connections.php';
 
