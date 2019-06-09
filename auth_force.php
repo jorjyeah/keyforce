@@ -156,12 +156,12 @@
     }
 
     function checkIdBle(){
-        $username = $_POST['username'];
+        $sessionid = $_POST['sessionid'];
         // !!!! please change to session id
         $idBleReceived = $_POST['idBle'];
         include 'connections.php';
 
-        $sql = 'SELECT macble FROM credential WHERE username="'.$username.'"';
+        $sql = 'SELECT macble FROM credential WHERE sessionid="'.$sessionid.'"';
         $result = mysqli_query($conn, $sql);
         
         if (mysqli_num_rows($result) > 0) {
