@@ -45,7 +45,15 @@
     }
 
     function generateNewChallenge(){
-        $challenge = bin2hex(random_bytes(8));
+        $username = $_POST['username'];
+        include 'connections.php';
+        $sql = "INSERT INTO credential (regstart,  username) VALUES (NOW(),'".$username."')";
+        if (mysqli_query($conn, $sql)) {
+            $challenge = bin2hex(random_bytes(8));
+        } else {
+            $challenge = 0;
+        }
+        mysqli_close($conn);
 
         // $username = $_POST['username'];
         // $status;
@@ -68,7 +76,21 @@
 
         // mysqli_close($conn);
         echo json_encode($challenge);
+        exit;
+    }
 
+    function regpairstart(){
+        $username = $_POST['username'];
+        include 'connections.php';
+        $sql = "UPDATE credential SET regpairstart = NOW() WHERE username = '".$username."'";
+        if (mysqli_query($conn, $sql)) {
+            $status = true;
+        } else {
+            $status = false;
+        }
+        mysqli_close($conn);
+
+        echo json_encode($status);
         exit;
     }
 
@@ -78,7 +100,7 @@
         $status;
         include 'connections.php';
 
-        $sql = "UPDATE credential SET macble='".$unique."' WHERE username = '".$username."'";
+        $sql = "UPDATE credential SET macble='".$unique."', regend= NOW() WHERE username = '".$username."'";
         
         if (mysqli_query($conn, $sql)) {
             $status = 1;
@@ -99,6 +121,9 @@
             break;
         case 'generateNewChallenge':
             generateNewChallenge();
+            break;
+        case 'regpairstart':
+            regpairstart();
             break;
         case 'inputUnique':
             inputUnique();

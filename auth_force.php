@@ -13,6 +13,7 @@
             $status = 0;
         }
         mysqli_close($conn);
+        authstart($username);
         echo json_encode($status);
         exit;
     }
@@ -56,6 +57,58 @@
         } else {
             updateChallenge($challenge);
         }
+    }
+
+    function authstart($usname){
+        include 'connections.php';
+        $sql = "UPDATE credential SET authstart = NOW() WHERE username = '".$usname."'";
+        if (mysqli_query($conn, $sql)) {
+            $status = true;
+        } else {
+            $status = false;
+        }
+        mysqli_close($conn);
+        
+    }
+
+    function authend($usname){
+        include 'connections.php';
+        $sql = "UPDATE credential SET authend = NOW() WHERE username = '".$usname."'";
+        if (mysqli_query($conn, $sql)) {
+            $status = true;
+        } else {
+            $status = false;
+        }
+        mysqli_close($conn);
+    
+    }
+
+    function authpairstart(){
+        $sessionid = $_POST['sessionid'];
+        include 'connections.php';
+        $sql = "UPDATE credential SET authpairstart = NOW() WHERE sessionid = '".$sessionid."'";
+        if (mysqli_query($conn, $sql)) {
+            $status = true;
+        } else {
+            $status = false;
+        }
+        mysqli_close($conn);
+        echo json_encode($status);
+        exit;
+    }
+    
+    function authpairend(){
+        $sessionid = $_POST['sessionid'];
+        include 'connections.php';
+        $sql = "UPDATE credential SET authpairend = NOW() WHERE sessionid = '".$sessionid."'";
+        if (mysqli_query($conn, $sql)) {
+            $status = true;
+        } else {
+            $status = false;
+        }
+        mysqli_close($conn);
+        echo json_encode($status);
+        exit;
     }
 
     function updateSession($sessionid){
@@ -111,7 +164,7 @@
             if($auth1 && $auth2){
                 //TODO: authenticated set as hash value
                 $_SESSION['authenticated']=true;
-                //header('Location:/2fysh/hello.php');
+                authend($username);
             }else{
                 $_SESSION['authenticated']=false;
             }
@@ -200,6 +253,12 @@
             break;
         case 'checkIdBle':
             checkIdBle();
+            break;
+        case 'authpairstart':
+            authpairstart();
+            break;
+        case 'authpairend':
+            authpairend();
             break;
         default:
             echo "false routing";

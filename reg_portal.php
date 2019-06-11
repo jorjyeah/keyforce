@@ -36,8 +36,7 @@
         //store everything (username, kpub, salt, key handle, counter, challenge)
 
         // prepare sql and insert to db
-        $sql = "INSERT INTO credential (username, publickey, salt, keyhandle, counter, challenge)
-        VALUES ('".$username."', '".$publickey."', '".$salt."', '".$keyhandle."', '".$counter."', '".$challenge."')";
+        $sql = "UPDATE credential SET publickey='".$publickey."', salt = '".$salt."', keyhandle = '".$keyhandle."', counter = '".$counter."', challenge ='".$challenge."' WHERE username='".$username."'";
         
         if (mysqli_query($conn, $sql)) {
             $status = 1;
